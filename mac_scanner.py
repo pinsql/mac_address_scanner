@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+import json
 import platform
 import re
 import subprocess
@@ -39,7 +40,7 @@ def get_interface():
     return "en0" if is_mac else "eth0"  # Default if detection fails
 
 def scan_network(interface):
-    print(f"\n🔥 Scanning the network on interface: {interface} 🔍")
+    print(f"\n🔥 Scanning the network on interface: {interface} 🔍", file=sys.stderr)
     # Argument list, no shell: the interface name can't smuggle in extra commands
     try:
         output = subprocess.check_output(["sudo", "arp-scan", "-I", interface, "--localnet"]).decode()
@@ -90,6 +91,7 @@ def print_results(devices):
 def get_arguments(argv=None):
     parser = argparse.ArgumentParser(description="Who's on the wire? MAC + vendor sweep via arp-scan")
     parser.add_argument("-i", "--iface", type=interface_name, help="Interface to scan (default: auto-detect)")
+    parser.add_argument("--json", action="store_true", help="Print results as JSON (pipe it into jq)")
     return parser.parse_args(argv)
 
 def main(argv=None):
@@ -97,7 +99,10 @@ def main(argv=None):
     interface = args.iface or get_interface()
     scan_output = scan_network(interface)
     devices = parse_results(scan_output)
-    print_results(devices)
+    if args.json:
+        print(json.dumps(devices, indent=2))
+    else:
+        print_results(devices)
 
 if __name__ == "__main__":
     main()
