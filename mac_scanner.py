@@ -5,7 +5,7 @@ import re
 from datetime import datetime
 import sys
 
-# Written by PinSteve 🕶️
+# Written by pinsql 🕶️
 # Network MAC Scanner – Hack Like a Pro 💻🔥
 
 def get_interface():
@@ -51,7 +51,7 @@ def print_results(devices):
     clear_screen()
     print("==========================================")
     print("💻 Wi-Fi Network MAC Scanner")
-    print("🕶️  Written by: pinsteve")
+    print("🕶️  Written by: pinsql")
     print("🕒 Time:", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     print("==========================================")
     print(f"\n📡 Devices Found: {len(devices)}\n")
