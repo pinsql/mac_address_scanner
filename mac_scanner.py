@@ -50,15 +50,21 @@ def scan_network(interface):
 
 def parse_results(scan_output):
     devices = []
-    lines = scan_output.splitlines()
-    for line in lines:
-        # Skip irrelevant lines
-        if re.match(r"^\d{1,3}(\.\d{1,3}){3}", line):
-            parts = line.split()
-            if len(parts) >= 2:
-                ip = parts[0]
-                mac = parts[1]
-                devices.append((ip, mac))
+    seen = set()
+    for line in scan_output.splitlines():
+        # Only lines that start with an IP are hosts; the rest is arp-scan chatter
+        if not re.match(r"^\d{1,3}(\.\d{1,3}){3}\s", line):
+            continue
+        parts = line.split("\t") if "\t" in line else line.split(None, 2)
+        if len(parts) < 2:
+            continue
+        ip, mac = parts[0].strip(), parts[1].strip()
+        # arp-scan prints the vendor as a third column and tags repeats with "(DUP: n)"
+        vendor = re.sub(r"\s*\(DUP: \d+\)$", "", parts[2].strip()) if len(parts) > 2 else ""
+        if (ip, mac) in seen:
+            continue
+        seen.add((ip, mac))
+        devices.append({"ip": ip, "mac": mac, "vendor": vendor or "unknown"})
     return devices
 
 def clear_screen():
@@ -75,8 +81,8 @@ def print_results(devices):
     print("==========================================")
     print(f"\n📡 Devices Found: {len(devices)}\n")
     
-    for i, (ip, mac) in enumerate(devices, start=1):
-        print(f" [{i}] 📍 IP: {ip:<15} 🧬 MAC: {mac}")
+    for i, device in enumerate(devices, start=1):
+        print(f" [{i}] 📍 IP: {device['ip']:<15} 🧬 MAC: {device['mac']}  🏷️  {device['vendor']}")
     
     print("\n✅ Done scanning. Stay stealthy. 😎")
     print("==========================================\n")
