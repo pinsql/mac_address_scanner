@@ -5,8 +5,8 @@ import json
 import platform
 import re
 import subprocess
-from datetime import datetime
 import sys
+from datetime import datetime
 
 # Written by pinsql 🕶️
 # Network MAC Scanner – Hack Like a Pro 💻🔥
@@ -78,7 +78,7 @@ def print_results(devices):
     print("==========================================")
     print("💻 Wi-Fi Network MAC Scanner")
     print("🕶️  Written by: pinsql")
-    print("🕒 Time:", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    print("🕒 Time:", datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S %Z"))
     print("==========================================")
     print(f"\n📡 Devices Found: {len(devices)}\n")
     
